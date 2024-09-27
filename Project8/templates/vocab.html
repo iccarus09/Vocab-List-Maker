@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary for {{ title }}</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vocabulary for {{ title }}</h1>
+
+    <!-- Form to add new vocabulary -->
+    <h2>Add New Vocabulary</h2>
+    <form id="add-vocab-form" method="post" action="{{ url_for('vocab', title_id=title_id) }}">
+        <input type="text" name="kanji" id="kanji" placeholder="Kanji" >
+        <input type="text" name="hiragana" id="hiragana" placeholder="Hiragana" required>
+        <input type="text" name="meaning" id ="meaning" placeholder="Meaning" required>
+        <input type="hidden" name="title_id" value="{{ title_id }}">
+        <button type="submit">Add</button>
+    </form>
+
+    <!-- Filter Button -->
+    <button id="filter-memorized">Show Memorized</button>
+    <button id="filter-unmemorized">Show Unmemorized</button>
+    <button id="show-all">Show All</button>
+
+    <h2>Vocabulary list</h2>
+    <table id="vocab-table">
+        <tr>
+            <th>Kanji</th>
+            <th>Hiragana</th>
+            <th>Meaning</th>
+            <th>Memorized?</th>
+        </tr>
+        {% for item in vocab_list %}
+        <tr class="{% if item.Memorized %}memorized{% endif %}">
+            <td>
+                {% if item.Kanji is not none and item.Kanji != 'None' %}
+                    {{ item.Kanji }}
+                {% else %}
+                    <span>No Kanji</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if item.Kanji is not none and item.Kanji != None %}
+                    <span class="hiragana hidden">{{ item.Hiragana }}</span>
+                    <button onclick="toggleHiragana(this)">Show/Hide Hiragana</button>
+                {% else %}
+                    {{ item.Hiragana }}
+                {% endif %}
+            </td>
+            <td>
+                <span class="meaning hidden">{{ item.Meaning }}</span>
+                <button onclick="toggleMeaning(this)">Show/Hide Meaning</button>
+            </td>
+            <!-- Checkbox for memorization -->
+            <td><input type="checkbox" class="memorized-checkbox" {% if item.Memorized %}checked{% endif %}></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        function toggleHiragana(button) {
+            $(button).prev('.hiragana').toggleClass('hidden');
+        }
+
+        function toggleMeaning(button) {
+            $(button).prev('.meaning').toggleClass('hidden');
+        }
+    </script>
+
+    <a href="{{ url_for('index') }}" class="button">Back to Main</a>
+</body>
+</html>
