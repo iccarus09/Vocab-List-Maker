@@ -1,7 +1,8 @@
-Kanji,Hiragana,Meaning,ID
-日本,にほん,Japan,1
-学校,がっこう,School,1
-,りんご,Apple,2
-
-kanji,hira,imi,1
-,ame,morning,1
+ID,Kanji,Hiragana,Meaning,Content_ID,Memorized
+1,日本,にほん,Japan,1,False
+2,学校,がっこう,School,1,True
+3,明るく,あるく,밝다,2,False
+4,私,わたし,나,1,False
+5,(empty),ㅠㅜㅏㅣ,ㅇㅇ,1,False
+6, 明るく,あるく,준비,1,False
+7,歩く,あるく,walk,1,False

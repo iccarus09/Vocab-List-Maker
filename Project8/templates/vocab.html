@@ -26,9 +26,11 @@
     <!-- Form to add new vocabulary -->
     <h2>Add New Vocabulary</h2>
     <form id="add-vocab-form" method="post" action="{{ url_for('vocab', title_id=title_id) }}">
-        <input type="text" name="kanji" id="kanji" placeholder="Kanji" >
-        <input type="text" name="hiragana" id="hiragana" placeholder="Hiragana" required>
-        <input type="text" name="meaning" id ="meaning" placeholder="Meaning" required>
+        <input type="text" name="kanji" id="kanji"
+               placeholder="Enter Kanji (optional)" >
+        <input type="text" name="hiragana" id="hiragana"
+               placeholder="Enter Hiragana" required>
+        <input type="text" name="meaning" id ="meaning" placeholder="Enter Meaning" required>
         <input type="hidden" name="title_id" value="{{ title_id }}">
         <button type="submit">Add</button>
     </form>
@@ -47,41 +49,35 @@
             <th>Memorized?</th>
         </tr>
         {% for item in vocab_list %}
-        <tr class="{% if item.Memorized %}memorized{% endif %}">
+        <tr>
             <td>
-                {% if item.Kanji is not none and item.Kanji != 'None' %}
+                {% if item.Kanji != '(empty)' %}
                     {{ item.Kanji }}
                 {% else %}
                     <span>No Kanji</span>
                 {% endif %}
             </td>
             <td>
-                {% if item.Kanji is not none and item.Kanji != None %}
-                    <span class="hiragana hidden">{{ item.Hiragana }}</span>
-                    <button onclick="toggleHiragana(this)">Show/Hide Hiragana</button>
-                {% else %}
-                    {{ item.Hiragana }}
-                {% endif %}
+                <span class="hiragana hidden">{{ item.Hiragana }}</span>
+                <button onclick="toggleHiragana(this)">Show/Hide Hiragana</button>
             </td>
             <td>
                 <span class="meaning hidden">{{ item.Meaning }}</span>
                 <button onclick="toggleMeaning(this)">Show/Hide Meaning</button>
             </td>
-            <!-- Checkbox for memorization -->
-            <td><input type="checkbox" class="memorized-checkbox" {% if item.Memorized %}checked{% endif %}></td>
+            <td>
+                {{ item.Memorized }}
+<!--            &lt;!&ndash; Checkbox for memorization &ndash;&gt;-->
+<!--            <td><input type="checkbox" name="memorized-checkbox"-->
+<!--                       value= {{ item.ID }}-->
+<!--                       {% if item.Memorized == '1' %}checked{% else %}unchecked{% endif %}-->
+<!--                onchange="updateMemorizedStatus(this, '{{ item.ID }}')">-->
+            </td>
         </tr>
         {% endfor %}
     </table>
 
-    <script>
-        function toggleHiragana(button) {
-            $(button).prev('.hiragana').toggleClass('hidden');
-        }
-
-        function toggleMeaning(button) {
-            $(button).prev('.meaning').toggleClass('hidden');
-        }
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
     <a href="{{ url_for('index') }}" class="button">Back to Main</a>
 </body>

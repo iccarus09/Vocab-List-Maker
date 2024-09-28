@@ -9,8 +9,8 @@ def read_csv(file_path):
 
 @app.route('/')
 def index():
-    titles_df = read_csv('data.csv')
-    titles = titles_df.to_dict(orient='records')
+    contents_df = read_csv('data.csv')
+    contents = contents_df.to_dict(orient='records')
 
     # Read vocab from vocab.csv to count entries per title_id
     vocab_df = read_csv('vocab.csv')
@@ -21,7 +21,7 @@ def index():
     # Convert the result to a dictionary for easy access in the template
     vocab_count_dict = vocab_count.set_index('ID')['count'].to_dict()
 
-    return render_template('index.html', titles=titles,
+    return render_template('index.html', contents=contents,
                            vocab_count=vocab_count_dict)
 
 @app.route('/vocab/<int:title_id>', methods=['GET','POST'])  # Allow both GET and POST methods
@@ -31,35 +31,56 @@ def vocab(title_id):
         kanji = request.form['kanji'].strip()
         hiragana = request.form['hiragana'].strip()
         meaning = request.form['meaning'].strip()
+        title_id = request.form['title_id']
+        memorized = False  # Set a default value or modify as needed
 
-        # Append the new vocabulary to the CSV file
-        with open('vocab.csv', 'a', newline='') as csvfile:
+        # Auto-create vocab_id
+        vocab_df = read_csv('vocab.csv')
+        if not vocab_df.empty:
+            max_id = vocab_df['ID'].max()
+        else:
+            max_id = 0
+        new_id = max_id + 1
+
+        # Append the new vocabulary to the CSV file, non-English available
+        # by encoding
+        with open('vocab.csv', 'a', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow([kanji if kanji else '', hiragana, meaning, title_id])
+            writer.writerow([new_id, kanji if kanji else '(empty)', hiragana,
+                             meaning,
+                             title_id, memorized])
 
         # Redirect back to the vocabulary page after adding
         return redirect('/vocab/{}'.format(title_id))
 
-    # Rest of the existing code for GET request
+        # Update the memorized status
+        with open('vocab.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([memorized])
+
+    # For GET requests: Read vocab and content data
     vocab_df = read_csv('vocab.csv')
-    title_df = read_csv('data.csv')
+    contents_df = read_csv('data.csv')
 
-    # Filter vocab by title_id
-    filtered_vocab = vocab_df[vocab_df['ID'] == title_id].to_dict(orient='records')
+    # Get the contents using title_id
+    title = contents_df[contents_df['ID'] == title_id]['Title'].values[0] if not \
+        contents_df[contents_df['ID'] == title_id].empty else "Missing Title"
 
-    # Get the title
-    title = title_df[title_df['ID'] == title_id]['Title'].values[0] if not \
-        title_df[title_df['ID'] == title_id].empty else "Missing Title"
+    # (1) Filter vocab_df based on title_id
+    vocab_list = vocab_df[vocab_df['Content_ID'] == title_id]
+
+    # (2) Convert filtered DataFrame to a list of dictionaries for rendering
+    vocab_list = vocab_list.to_dict(orient='records')
 
     return render_template('vocab.html', title=title,
-                           vocab_list=filtered_vocab, title_id=title_id) # undefined title_id issue resolved!
+                           title_id=title_id, vocab_list=vocab_list)
 
-
-@app.route('/get_meaning/<int:vocab_id>')
-def get_meaning(vocab_id):
-    vocab_df = read_csv('vocab.csv')
-    meaning = vocab_df.loc[vocab_df.index == vocab_id, 'Meaning'].values[0]
-    return jsonify({'meaning': meaning})
+# DONT NEED AT THE MOMENT
+# @app.route('/get_meaning/<int:vocab_id>')
+# def get_meaning(vocab_id):
+#     vocab_df = read_csv('vocab.csv')
+#     meaning = vocab_df.loc[vocab_df['ID'] == vocab_id, 'Meaning'].values[0]
+#     return jsonify({'meaning': meaning})
 
 if __name__ == '__main__':
     app.run(debug=True)
