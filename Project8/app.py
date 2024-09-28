@@ -71,12 +71,25 @@ def vocab(title_id):
     return render_template('vocab.html', title=title,
                            title_id=title_id, vocab_list=vocab_list)
 
-# DONT NEED AT THE MOMENT
-# @app.route('/get_meaning/<int:vocab_id>')
-# def get_meaning(vocab_id):
-#     vocab_df = read_csv('vocab.csv')
-#     meaning = vocab_df.loc[vocab_df['ID'] == vocab_id, 'Meaning'].values[0]
-#     return jsonify({'meaning': meaning})
+@app.route('/mylist', methods=['GET','POST'])
+def get_mylist():
+    # Handle deletion
+    if request.method == 'POST':
+        id_to_delete = request.form.get('id')
+
+        if id_to_delete:
+            vocab_df = read_csv('vocab.csv')
+            # Remove the item with this ID
+            vocab_df = vocab_df[vocab_df['ID'] != int(id_to_delete)]
+            write_csv('vocab.csv', vocab_df)
+
+        # Redirect after deletion
+        return redirect(url_for('get_mylist'))
+
+    # Handle GET request
+    vocab_df = read_csv('vocab.csv')
+    mylists = vocab_df.to_dict(orient='records')
+    return render_template('mylist.html', mylists=mylists)
 
 if __name__ == '__main__':
     app.run(debug=True)

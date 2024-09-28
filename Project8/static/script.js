@@ -6,4 +6,4 @@ function toggleHiragana(button) {
 function toggleMeaning(button) {
     const meaningSpan = button.previousElementSibling;
     meaningSpan.classList.toggle('hidden');
-}
+    }
