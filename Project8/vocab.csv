@@ -1,7 +1,7 @@
 ID,Kanji,Hiragana,Meaning,Content_ID,Memorized
-2,学校,がっこう,School,1,False
+2,学校,がっこう,School,1,True
 3,明るく,あるく,밝다,2,False
-4,私,わたし,나,1,True
-6, 明るく,あるく,준비,1,False
+4,私,わたし,나,1,False
+6, 明るく,あるく,준비,1,True
 7,歩く,あるく,walk,1,False
 8,(empty),hey,working?,1,False

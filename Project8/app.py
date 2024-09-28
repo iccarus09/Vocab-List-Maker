@@ -36,24 +36,12 @@ def vocab(title_id):
     if request.method == 'POST':
         # Adding new vocab
         if 'kanji' in request.form:
-            kanji = request.form['kanji'].strip()
-            hiragana = request.form['hiragana'].strip()
-            meaning = request.form['meaning'].strip()
-
-            new_id = vocab_df['ID'].max() + 1 if not vocab_df.empty else 1
-            new_row = pd.DataFrame({
-                'ID': [new_id],
-                'Kanji': [kanji if kanji else '(empty)'],
-                'Hiragana': [hiragana],
-                'Meaning': [meaning],
-                'Content_ID': [title_id],
-                'Memorized': [False] # Default = False
-            })
-            vocab_df = pd.concat([vocab_df, new_row], ignore_index=True)
+            # Adding new vocab (keep this part as is)
+            ...
         else:  # Update the 'Memorized' column based on checkbox selection
             memorized_ids = request.form.getlist('memorized_ids')
-            vocab_df['Memorized'] = vocab_df['ID'].astype(str).isin(
-            memorized_ids)
+            vocab_df.loc[vocab_df['Content_ID'] == title_id, 'Memorized'] = \
+                vocab_df.loc[vocab_df['Content_ID'] == title_id, 'ID'].astype(str).isin(memorized_ids)
 
         write_csv('vocab.csv', vocab_df)
         return redirect(url_for('vocab', title_id=title_id))
@@ -65,7 +53,7 @@ def vocab(title_id):
     # (1) Filter vocab_df based on title_id
     vocab_list = vocab_df[vocab_df['Content_ID'] == title_id]
 
-    # (2) Convert filtered DataFrame to a list of dictionaries for rendering
+    # Convert filtered DataFrame to a list of dictionaries for rendering
     vocab_list = vocab_list.to_dict(orient='records')
 
     return render_template('vocab.html', title=title,

@@ -3,42 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vocabulary for {{ title }}</title>
+    <title>Vocabulary Page</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/main.css') }}">
 </head>
 <body>
     <h1>Vocabulary for {{ title }}</h1>
 
     <!-- Form to add new vocabulary -->
     <h2>Add New Vocabulary</h2>
-    <form id="add-vocab-form" method="post" action="{{ url_for('vocab', title_id=title_id) }}">
+    <form id="add-vocab-form" method="post"
+          action="{{ url_for('vocab', title_id=title_id) }}" class="form-with-padding">
         <input type="text" name="kanji" id="kanji"
                placeholder="Enter Kanji (optional)" >
         <input type="text" name="hiragana" id="hiragana"
                placeholder="Enter Hiragana" required>
         <input type="text" name="meaning" id ="meaning" placeholder="Enter Meaning" required>
         <input type="hidden" name="title_id" value="{{ title_id }}">
-        <button type="submit">Add</button>
+        <button type="submit" class="btn-sub">Add</button>
     </form>
 
     <!-- Filter Button -->
-    <button id="filter-memorized">Show Memorized</button>
-    <button id="filter-unmemorized">Show Unmemorized</button>
-    <button id="show-all">Show All</button>
+    <button id="show-memorized" class="btn-memorized">Show Memorized</button>
+    <button id="show-unmemorized" class="btn-unmemorized">Show
+        Unmemorized</button>
+    <button id="show-all" class="btn-sub">Show All</button>
 
     <h2>Vocabulary list</h2>
     <form method="POST" action="{{ url_for('vocab', title_id=title_id) }}">
@@ -63,25 +52,27 @@
                         {{ item.Hiragana }}
                     {% else %}
                         <span class="hiragana hidden">{{ item.Hiragana }}</span>
-                        <button type="button" onclick="toggleHiragana(this)">Show/Hide Hiragana</button>
+                        <button type="button" onclick="toggleHiragana(this)"
+                            class="btn-toggle">Show/Hide Hiragana</button>
                     {% endif %}
                 </td>
                 <td>
                     <span class="meaning hidden">{{ item.Meaning }}</span>
-                    <button type="button" onclick="toggleMeaning(this)">Show/Hide Meaning</button>
+                    <button type="button" onclick="toggleMeaning(this)"
+                            class="btn-toggle">Show/Hide Meaning</button>
                 </td>
                 <td>
                     <input type="checkbox" name="memorized_ids" value="{{ item.ID }}"
-                       {% if item.Memorized == True %}checked{% endif %}>
+                       {% if item.Memorized %}checked{% endif %}>
                 </td>
             </tr>
             {% endfor %}
         </table>
-        <button type="submit">Update Memorized Status</button>
+        <button type="submit" class="btn-sub">Update Memorized Status</button>
     </form>
 
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
-    <a href="{{ url_for('index') }}" class="button">Back to Main</a>
+    <a href="{{ url_for('index') }}" class="btn-back">Back to Main</a>
 </body>
 </html>

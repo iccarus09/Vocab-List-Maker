@@ -18,6 +18,7 @@
             background-color: #f2f2f2;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/main.css') }}">
 </head>
 <body>
     <h1>Contents List</h1>
@@ -30,7 +31,7 @@
         </tr>
         {% for content in contents %}
         <tr>
-            <td><a href="/vocab/{{ content.ID }}">{{ content.Title }}</a></td>
+            <td  class="left-align"><a href="/vocab/{{ content.ID }}">{{ content.Title }}</a></td>
             <td><a href="https://{{ content.Link }}" target="_blank">Link
             </a></td>
             <td>{{ content.Level }}</td>
@@ -38,6 +39,6 @@
         </tr>
         {% endfor %}
     </table>
-    <a href="/mylist" class="button">Go to My List</a>
+    <a href="/mylist" class="btn-back"">Go to My List</a>
 </body>
 </html>

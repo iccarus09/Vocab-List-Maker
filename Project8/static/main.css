@@ -1,0 +1,144 @@
+/* General Styles */
+body {
+    background-color: #e7d5f0; /* Set the background color */
+    font-family: cursive, sans-serif; /* Use a clean font */
+    margin: 0;
+    padding: 20px; /* Add some padding around the content */
+    color: #333; /* Set a dark text color for readability */
+}
+
+/* Headings */
+h1 {
+    text-align: center; /* Center align the main title */
+    color: #5a2d91; /* Darker shade for the main heading */
+}
+
+h2 {
+    color: #5a2d91; /* Consistent color for subheadings */
+}
+
+/* New vocab addition */
+.form-with-padding {
+    margin-bottom: 15px; /* Space between forms */
+    padding: 15px;
+    background-color: white; /* White background for forms */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+input[type="text"] {
+    width: calc(100% - 20px); /* Full width minus padding */
+    padding: 10px;
+    margin-bottom: 10px; /* Space between inputs */
+    border: 1px solid #ccc; /* Light border for inputs */
+    border-radius: 4px; /* Rounded corners for inputs */
+}
+
+.btn-delete {
+    padding: 10px 15px; /* Padding inside buttons */
+    background-color: #5a2d91; /* Button background color */
+    color: white; /* Button text color */
+    border-radius: 4px; /* Rounded corners for buttons */
+    font-family: cursive, sans-serif;
+    cursor: pointer; /* Pointer cursor on hover */
+    border: none;
+    margin: 0;
+}
+
+button:hover {
+    background-color: #4b1f7a; /* Darker shade on hover */
+    color: white;
+}
+
+/* Table Styles */
+table {
+    width: 100%; /* Full width of the container */
+    border-collapse: collapse; /* Merge borders of table cells */
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #5a2d91; /* Header background color */
+    color: white; /* Header text color */
+}
+
+.left-align{
+    text-align: left;
+}
+
+.hidden {
+    display: none;
+        }
+
+.btn-back {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #5a2d91;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+}
+
+.btn-sub {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 8px;
+    background-color: #534794;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+    border: none
+}
+
+.btn-memorized{
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 8px;
+    background-color: #0a240a;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+    border: none
+}
+
+.btn-unmemorized{
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 8px;
+    background-color: #360c0e;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+    border: none
+}
+
+.btn-toggle{
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 5px;
+    color: #0f273d;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+    border: black
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.green-circle {
+    background-color: green;
+}
+
+.red-circle {
+    background-color: red;
+}
