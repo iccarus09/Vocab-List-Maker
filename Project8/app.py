@@ -1,11 +1,14 @@
 import pandas as pd
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 import csv
 
 app = Flask(__name__)
 
 def read_csv(file_path):
     return pd.read_csv(file_path)
+
+def write_csv(file_path, data):
+    data.to_csv(file_path, index=False)
 
 @app.route('/')
 def index():
@@ -16,53 +19,46 @@ def index():
     vocab_df = read_csv('vocab.csv')
 
     # Count the number of vocabs per title_id
-    vocab_count = vocab_df.groupby('ID').size().reset_index(name='count')
+    vocab_count = vocab_df.groupby('Content_ID').size().reset_index(name='count')
 
     # Convert the result to a dictionary for easy access in the template
-    vocab_count_dict = vocab_count.set_index('ID')['count'].to_dict()
+    vocab_count_dict = vocab_count.set_index('Content_ID')['count'].to_dict()
 
     return render_template('index.html', contents=contents,
                            vocab_count=vocab_count_dict)
 
 @app.route('/vocab/<int:title_id>', methods=['GET','POST'])  # Allow both GET and POST methods
 def vocab(title_id):
-    # Handle form submission
-    if request.method == 'POST':
-        kanji = request.form['kanji'].strip()
-        hiragana = request.form['hiragana'].strip()
-        meaning = request.form['meaning'].strip()
-        title_id = request.form['title_id']
-        memorized = False  # Set a default value or modify as needed
-
-        # Auto-create vocab_id
-        vocab_df = read_csv('vocab.csv')
-        if not vocab_df.empty:
-            max_id = vocab_df['ID'].max()
-        else:
-            max_id = 0
-        new_id = max_id + 1
-
-        # Append the new vocabulary to the CSV file, non-English available
-        # by encoding
-        with open('vocab.csv', 'a', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow([new_id, kanji if kanji else '(empty)', hiragana,
-                             meaning,
-                             title_id, memorized])
-
-        # Redirect back to the vocabulary page after adding
-        return redirect('/vocab/{}'.format(title_id))
-
-        # Update the memorized status
-        with open('vocab.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([memorized])
-
-    # For GET requests: Read vocab and content data
     vocab_df = read_csv('vocab.csv')
     contents_df = read_csv('data.csv')
 
-    # Get the contents using title_id
+    # Handle form submission
+    if request.method == 'POST':
+        # Adding new vocab
+        if 'kanji' in request.form:
+            kanji = request.form['kanji'].strip()
+            hiragana = request.form['hiragana'].strip()
+            meaning = request.form['meaning'].strip()
+
+            new_id = vocab_df['ID'].max() + 1 if not vocab_df.empty else 1
+            new_row = pd.DataFrame({
+                'ID': [new_id],
+                'Kanji': [kanji if kanji else '(empty)'],
+                'Hiragana': [hiragana],
+                'Meaning': [meaning],
+                'Content_ID': [title_id],
+                'Memorized': [False] # Default = False
+            })
+            vocab_df = pd.concat([vocab_df, new_row], ignore_index=True)
+        else:  # Update the 'Memorized' column based on checkbox selection
+            memorized_ids = request.form.getlist('memorized_ids')
+            vocab_df['Memorized'] = vocab_df['ID'].astype(str).isin(
+            memorized_ids)
+
+        write_csv('vocab.csv', vocab_df)
+        return redirect(url_for('vocab', title_id=title_id))
+
+    # For GET requests: Read vocab and content data
     title = contents_df[contents_df['ID'] == title_id]['Title'].values[0] if not \
         contents_df[contents_df['ID'] == title_id].empty else "Missing Title"
 

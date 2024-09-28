@@ -41,41 +41,44 @@
     <button id="show-all">Show All</button>
 
     <h2>Vocabulary list</h2>
-    <table id="vocab-table">
-        <tr>
-            <th>Kanji</th>
-            <th>Hiragana</th>
-            <th>Meaning</th>
-            <th>Memorized?</th>
-        </tr>
-        {% for item in vocab_list %}
-        <tr>
-            <td>
-                {% if item.Kanji != '(empty)' %}
-                    {{ item.Kanji }}
-                {% else %}
-                    <span>No Kanji</span>
-                {% endif %}
-            </td>
-            <td>
-                <span class="hiragana hidden">{{ item.Hiragana }}</span>
-                <button onclick="toggleHiragana(this)">Show/Hide Hiragana</button>
-            </td>
-            <td>
-                <span class="meaning hidden">{{ item.Meaning }}</span>
-                <button onclick="toggleMeaning(this)">Show/Hide Meaning</button>
-            </td>
-            <td>
-                {{ item.Memorized }}
-<!--            &lt;!&ndash; Checkbox for memorization &ndash;&gt;-->
-<!--            <td><input type="checkbox" name="memorized-checkbox"-->
-<!--                       value= {{ item.ID }}-->
-<!--                       {% if item.Memorized == '1' %}checked{% else %}unchecked{% endif %}-->
-<!--                onchange="updateMemorizedStatus(this, '{{ item.ID }}')">-->
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <form method="POST" action="{{ url_for('vocab', title_id=title_id) }}">
+        <table id="vocab-table">
+            <tr>
+                <th>Kanji</th>
+                <th>Hiragana</th>
+                <th>Meaning</th>
+                <th>Memorized?</th>
+            </tr>
+            {% for item in vocab_list %}
+            <tr>
+                <td>
+                    {% if item.Kanji != '(empty)' %}
+                        {{ item.Kanji }}
+                    {% else %}
+                        <span>No Kanji</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.Kanji == '(empty)' %}
+                        {{ item.Hiragana }}
+                    {% else %}
+                        <span class="hiragana hidden">{{ item.Hiragana }}</span>
+                        <button type="button" onclick="toggleHiragana(this)">Show/Hide Hiragana</button>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="meaning hidden">{{ item.Meaning }}</span>
+                    <button type="button" onclick="toggleMeaning(this)">Show/Hide Meaning</button>
+                </td>
+                <td>
+                    <input type="checkbox" name="memorized_ids" value="{{ item.ID }}"
+                       {% if item.Memorized == True %}checked{% endif %}>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">Update Memorized Status</button>
+    </form>
 
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
