@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Contents Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/main.css') }}">
+</head>
+<body>
+    <h1>Contents Edit List</h1>
+
+    <!-- Form to add new contents -->
+    <h2>Add New Contents</h2>
+    <form id="add-contents-form" class="form-with-padding">
+        <input type="text" name="title" id="title" placeholder="Enter Title" required>
+        <input type="text" name="youtube" id="youtube" placeholder="Enter Youtube Link" required>
+        <button type="submit" class="btn-sub">Add</button>
+    </form>
+
+    <h2>Contents list</h2>
+    <table id="contents-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Level</th>
+                <th>Number of Vocab</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for content in contents %}
+            <tr data-id="{{ content.ID}}">
+                <td class="left-align"><a href="{{ content.Link }}" target="_blank">{{ content.Title }} </a></td>
+                <td>{{ content.Level }}</td>
+                <td>{{ content.Vocab_Count }}</td>
+                <td><button class="btn-delete" data-id="{{ content.ID }}">Delete</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('index') }}" class="btn-back">Back to Main</a>
+    <a href="/mylist" class="btn-back">Go to My List</a>
+
+    <script src="{{ url_for('static', filename='edit_contents.js') }}"></script>
+</body>
+</html>

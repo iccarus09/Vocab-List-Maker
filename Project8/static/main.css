@@ -54,6 +54,7 @@ button:hover {
 table {
     width: 100%; /* Full width of the container */
     border-collapse: collapse; /* Merge borders of table cells */
+    margin-top: 5px;
 }
 
 th, td {
@@ -84,6 +85,26 @@ th {
     font-family: cursive, sans-serif;
     border-radius: 4px;
 }
+
+.btn-back {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #5a2d91;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+}
+
+.btn-back-no-margin {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #5a2d91;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+}
+
 
 .btn-sub {
     display: inline-block;
