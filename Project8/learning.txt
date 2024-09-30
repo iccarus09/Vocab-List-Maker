@@ -1,0 +1,43 @@
+Merge the original and new(temp) table for better processing
+1. Rename the 'Vocab_Count' column in vocab_count to 'Vocab_Cal' to avoid confusion.
+2. Merge the DataFrames using the appropriate keys.
+3. Update the 'Vocab_Count' column in the merged DataFrame with values from 'Vocab_Cal'.
+4. Drop the 'Vocab_Cal' column as it's no longer needed.
+
+The reason the table doesn't immediately update as soon as the user adds
+a vocabulary item is due to how the data flow and page rendering are currently implemented.
+
+Universal Level Calculation: make functions
+I've created a get_vocab_count_and_level() function
+Reducing Repetitive Code:
+The CSV reading and writing operations are now centralized in the read_csv() and write_csv() functions.
+
+Problem 1: Immediate Update of vocab.csv Not Reflecting in vocab.html
+you're reading the vocab.csv file at the beginning of the route but not updating the HTML after a successful addition. you need to make sure that the updated vocab_df is passed to the template after any modifications.
+
+this is vocab page structure
+if vocab is added,
+    duplication check > pass: update vocab.csv file + update vocab.html
+    duplication check > fail: error message pop up
+
+if no vocab is added,
+  no filter button is pressed > render vocab.html
+  if filter button is pressed > filter the data based on the filter button (filter button: memorized, unmemorized, all)
+
+Handling Vocabulary Addition
+Form Submission Check:
+The code checks if the request method is POST, indicating a form submission.
+New Vocabulary Entry:
+If the form includes a 'kanji' field, it retrieves the new vocabulary details.
+It performs a duplication check:
+If kanji is provided, it checks for duplicates in the Kanji column.
+If kanji is not provided, it checks for duplicates based on Hiragana.
+Error Handling:
+If duplicates are found, an error message is appended to the errors list and rendered back to the user.
+If no duplicates are found, it creates a new entry, updates the DataFrame, and writes back to the CSV file.
+Handling Vocabulary Filtering
+No Vocabulary Added:
+If the request method is GET, it retrieves the title and filters the vocabulary DataFrame based on title_id.
+It converts the filtered DataFrame to a list of dictionaries for rendering in the HTML template.
+Filter Button Logic:
+The code does not explicitly show filtering based on button presses (like "memorized", "unmemorized", or "all"). You may need to implement this logic if it's not already covered elsewhere in your application.

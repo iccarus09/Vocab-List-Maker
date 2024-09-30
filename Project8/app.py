@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response, flash
 import helpers
 
 app = Flask(__name__)
@@ -13,64 +13,86 @@ def index():
     return render_template('index.html', contents=contents,
                            vocab_count=vocab_count_dict)
 
-# @app.route('/vocab/<int:title_id>', methods=['GET', 'POST'])  # Allow both GET and POST methods
-# def vocab(title_id):
-#     contents_df = pd.read_csv('data.csv')
-#
-#     # Handle form submission
-#     if request.method == 'POST':
-#         vocab_df = pd.read_csv('vocab.csv')
-#         if 'kanji' in request.form:
-#             # Get the new vocab details from the form
-#             kanji = request.form.get('kanji', '').strip() # kanji is optional so use get
-#             hiragana = request.form['hiragana'].strip() # compulsory field
-#             meaning = request.form['meaning'].strip()
-#
-#             # Implement data validation logic
-#             if kanji:
-#                 duplicate = vocab_df[vocab_df['Kanji'] == kanji]
-#             else:
-#                 duplicate = vocab_df[vocab_df['Hiragana'] == hiragana]
-#
-#             # Check for duplicates
-#             if not duplicate.empty:
-#                 return jsonify({"error": f"This word was added. "
-#                                          f"Please refer to Contents {duplicate['Content_ID'].values[0]}"})
-#
-#             # If no duplicates, create a new entry
-#             new_id = vocab_df['ID'].max() + 1 if not vocab_df.empty else 1
-#             new_row = pd.DataFrame({
-#                 'ID': [new_id],
-#                 'Kanji': [kanji if kanji else '(empty)'],
-#                 'Hiragana': [hiragana],
-#                 'Meaning': [meaning],
-#                 'Content_ID': [title_id],
-#                 'Memorized': [False]  # Default = False
-#             })
-#             vocab_df = pd.concat([vocab_df, new_row], ignore_index=True)
-#
-#         else:  # Update the 'Memorized' column based on checkbox selection
-#             memorized_ids = request.form.getlist('memorized_ids')
-#             vocab_df.loc[vocab_df['Content_ID'] == title_id, 'Memorized'] = \
-#                 vocab_df.loc[vocab_df['Content_ID'] == title_id, 'ID'].astype(str).isin(memorized_ids)
-#
-#         # Write updated DataFrame back to CSV
-#         write_csv('vocab.csv', vocab_df)
-#         vocab_df = pd.read_csv('vocab.csv') # Reload
-#
-#     # Read vocab and content data
-#     title = contents_df[contents_df['ID'] == title_id]['Title'].values[0] if not \
-#         contents_df[contents_df['ID'] == title_id].empty else "Missing Title"
-#
-#     # (1) Filter vocab_df based on title_id
-#     vocab_list = vocab_df[vocab_df['Content_ID'] == title_id]
-#
-#     # Convert filtered DataFrame to a list of dictionaries for rendering
-#     vocab_list = vocab_list.to_dict(orient='records')
-#
-#     return render_template('vocab.html', title=title,
-#                            title_id=title_id, vocab_list=vocab_list)
-#
+@app.route('/vocab/<int:title_id>', methods=['GET', 'POST'])
+def vocab(title_id):
+    contents_df = helpers.get_vocab_count_and_level()
+    vocab_df = helpers.read_csv('vocab.csv')
+
+    if request.method == 'POST':
+        if 'kanji' in request.form:
+            # Handle adding new vocab
+            new_vocab = {
+                'kanji': request.form.get('kanji', '').strip(),  # kanji is optional so use get
+                'hiragana': request.form['hiragana'].strip(), # compulsory field
+                'meaning': request.form['meaning'].strip()
+            }
+            # Implement data validation logic
+            if new_vocab['kanji']:
+                duplicate = vocab_df[vocab_df['Kanji'] == new_vocab['kanji']]
+            else:
+                duplicate = vocab_df[vocab_df['Hiragana'] == new_vocab['hiragana']]
+
+            # Check for duplicates
+            if not duplicate.empty:
+                error = 'Your new entry is duplicated'
+                title = \
+                contents_df[contents_df['ID'] == title_id]['Title'].values[0]
+                vocab_list = vocab_df[
+                    vocab_df['Content_ID'] == title_id].to_dict(
+                    orient='records')
+                return render_template('vocab.html', title=title,
+                                       title_id=title_id,
+                                       vocab_list=vocab_list, error=error)
+            else:
+                # If no duplicates, create a new entry
+                new_id = vocab_df['ID'].max() + 1 if not vocab_df.empty else 1
+                new_row = pd.DataFrame({
+                    'ID': [new_id],
+                    'Kanji': [new_vocab['kanji'] if new_vocab['kanji'] else '(empty)'],
+                    'Hiragana': [new_vocab['hiragana']],
+                    'Meaning': [new_vocab['meaning']],
+                    'Content_ID': [title_id],
+                    'Memorized': [False]  # Default = False
+                })
+                vocab_df = pd.concat([vocab_df, new_row], ignore_index=True)
+
+                # Write updated DataFrame back to CSV
+                helpers.write_csv('vocab.csv', vocab_df)
+                vocab_df = helpers.read_csv('vocab.csv')
+
+                # flash('New vocabulary is added!', 'success')
+                title = \
+                contents_df[contents_df['ID'] == title_id]['Title'].values[0]
+                vocab_list = vocab_df[
+                    vocab_df['Content_ID'] == title_id].to_dict(
+                    orient='records')
+
+                return redirect('/vocab/{}'.format(title_id))
+                # return render_template('vocab.html', title=title, title_id=title_id, vocab_list=vocab_list)
+
+        else:  # Update the 'Memorized' column based on checkbox selection
+            memorized_ids = request.form.getlist('memorized_ids')
+            vocab_df.loc[vocab_df['Content_ID'] == title_id, 'Memorized'] = \
+                vocab_df.loc[vocab_df['Content_ID'] == title_id, 'ID'].astype(str).isin(memorized_ids)
+            title = contents_df[contents_df['ID'] == title_id]['Title'].values[0]
+            vocab_list = vocab_df[
+                vocab_df['Content_ID'] == title_id].to_dict(
+                orient='records')
+            return render_template('vocab.html', title=title, title_id=title_id,
+                               vocab_list=vocab_list)
+
+    else:
+        # Read vocab and content data
+        title = contents_df[contents_df['ID'] == title_id]['Title'].values[0]
+
+        # (1) Filter vocab_df based on title_id
+        vocab_list = vocab_df[vocab_df['Content_ID'] == title_id]
+
+        # Convert filtered DataFrame to a list of dictionaries for rendering
+        vocab_list = vocab_list.to_dict(orient='records')
+
+        return render_template('vocab.html', title=title, title_id=title_id, vocab_list=vocab_list) #2
+
 # @app.route('/mylist', methods=['GET','POST'])
 # def get_mylist():
 #     # Handle deletion

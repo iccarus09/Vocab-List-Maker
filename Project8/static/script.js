@@ -40,3 +40,36 @@ document.addEventListener('DOMContentLoaded', function() {
         filterTable('all');
     });
 });
+
+// Duplicate error pop up
+document.getElementById('add-vocabulary-form').addEventListener('submit', function(event) {event.preventDefault();
+
+    const formData = new FormData(this);
+
+    // Extract title_id from the URL
+    const pathSegments = window.location.pathname.split('/');
+    const titleId = pathSegments[pathSegments.length - 1]; // Get the last segment of the path
+
+    fetch(`/vocab/${titleId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showPopup(data.error); // Show error message in popup
+        } else {
+            alert(data.success); // Or another way to notify success
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function showPopup(message) {
+    document.getElementById('popupMessage').innerText = message;
+    document.getElementById('popup').style.display = 'flex'; // Show the popup
+}
+
+function closePopup() {
+    document.getElementById('popup').style.display = 'none'; // Hide the popup
+}
