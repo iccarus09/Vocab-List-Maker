@@ -17,6 +17,7 @@ def determine_level(count):
 
 def get_vocab_count_and_level():
     contents_df = read_csv('data.csv')
+
     vocab_df = read_csv('vocab.csv')
     # Create a copy of the DataFrame to avoid SettingWithCopyWarning
     new_vocab_df = vocab_df.copy()
@@ -31,8 +32,8 @@ def get_vocab_count_and_level():
     merged_df = contents_df.merge(vocab_count, left_on='ID',
                                   right_on='Content_ID', how='left')
 
-    # Debugging: Print out merged DataFrame
-    print("Merged DataFrame:\n", merged_df)
+    # # Debugging: Print out merged DataFrame
+    # print("Merged DataFrame:\n", merged_df)
 
     # Use .loc[] to fill NaN values and convert to int
     merged_df.loc[:, 'Vocab_Cal'] = merged_df['Vocab_Cal'].fillna(0).astype(int)

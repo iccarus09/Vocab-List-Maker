@@ -10,27 +10,34 @@
 <body>
     <h1>Vocabulary for {{ title }}</h1>
 
+    <!-- Display error message if it exists -->
+    {% if error %}
+        <div class="error" style="color: red;">{{ error | default('No error message') }}</div>
+    {% endif %}
+
     <!-- Form to add new vocabulary -->
     <h2>Add New Vocabulary</h2>
-    <form id="add-vocabulary-form" method="post"
-          action="{{ url_for('vocab', title_id=title_id) }}" class="form-with-padding">
+    <form id="add-vocabulary-form" method="POST"
+          action="{{ url_for('vocab', title_id=title_id) }}" class="form-with-padding" onsubmit="return submitForm()">
         <input type="text" name="kanji" id="kanji"
                placeholder="Enter Kanji (optional)" >
         <input type="text" name="hiragana" id="hiragana"
                placeholder="Enter Hiragana" required>
         <input type="text" name="meaning" id ="meaning" placeholder="Enter Meaning" required>
         <input type="hidden" name="title_id" value="{{ title_id }}">
+        <input type="hidden" name="action" value="add_vocab"> <!-- Action identifier 1:add -->
         <button type="submit" class="btn-sub">Add</button>
     </form>
 
-    <!-- Filter Button -->
+    <!-- Filter Buttons -->
     <button id="show-memorized" class="btn-memorized">Show Memorized</button>
     <button id="show-unmemorized" class="btn-unmemorized">Show
         Unmemorized</button>
     <button id="show-all" class="btn-sub">Show All</button>
 
     <h2>Vocabulary list</h2>
-    <form method="POST" action="{{ url_for('vocab', title_id=title_id) }}">
+    <form id="vocabulary-list-form" method="POST" action="{{ url_for('vocab', title_id=title_id) }}">
+        <input type="hidden" name="action" value="update_vocab"> <!-- Action identifier 2:update-->
         <table id="vocab-table">
             <tr>
                 <th>Kanji</th>
@@ -40,13 +47,7 @@
             </tr>
             {% for item in vocab_list %}
             <tr>
-                <td>
-                    {% if item.Kanji != '(empty)' %}
-                        {{ item.Kanji }}
-                    {% else %}
-                        <span>No Kanji</span>
-                    {% endif %}
-                </td>
+                <td>{{ item.Kanji if item.Kanji != '(empty)' else 'No Kanji' }}</td>
                 <td>
                     {% if item.Kanji == '(empty)' %}
                         {{ item.Hiragana }}

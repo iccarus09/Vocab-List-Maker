@@ -8,6 +8,11 @@ function toggleMeaning(button) {
     meaningSpan.classList.toggle('hidden');
     }
 
+function submitForm() {
+    // Clear inputs
+    document.getElementById("add-vocabulary-form").reset(); // Resets all fields
+    return true; // Allow form submission to proceed "return submitForm"
+}
 // Filter view
 document.addEventListener('DOMContentLoaded', function() {
     const table = document.getElementById('vocab-table');
