@@ -6,74 +6,91 @@
     <title>Vocabulary Page</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='/main.css') }}">
+    <script>
+        console.log("Inline script start");
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded and parsed");
+
+            // Add event listener to all delete buttons
+            var deleteButtons = document.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    console.log("Delete button clicked");
+                    var itemId = this.getAttribute('data-id');
+                    console.log("Item ID:", itemId);
+
+                    // Prevent the default action
+                    event.preventDefault();
+
+                    // Send DELETE request
+                    fetch('/edit-vocab/' + {{ title_id }}, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: itemId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        if (data.status === 'success') {
+                            // Remove the table row
+                            this.closest('tr').remove();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        });
+
+        console.log("Inline script end");
+    </script>
+    <script src="{{ url_for('static', filename='edit_vocab.js') }}" ></script>
+
+<!--        function buttonClicked() {-->
+<!--            alert("Button was pressed!"); // Show alert-->
+<!--        }-->
 </head>
 <body>
-    <h1>Vocabulary for {{ title }}</h1>
-
-    <!-- Display error message if it exists -->
-    {% if error %}
-        <div class="error" style="color: red;">{{ error | default('No error message') }}</div>
-    {% endif %}
+    <h1>Edit Vocabulary for {{ title }}</h1>
 
     <!-- Form to add new vocabulary -->
     <h2>Add New Vocabulary</h2>
-    <form id="add-vocabulary-form" method="POST"
-          action="{{ url_for('vocab', title_id=title_id) }}" class="form-with-padding" onsubmit="return submitForm()">
-        <input type="text" name="kanji" id="kanji"
-               placeholder="Enter Kanji (optional)" >
-        <input type="text" name="hiragana" id="hiragana"
-               placeholder="Enter Hiragana" required>
-        <input type="text" name="meaning" id ="meaning" placeholder="Enter Meaning" required>
-        <input type="hidden" name="title_id" value="{{ title_id }}">
-        <input type="hidden" name="action" value="add_vocab"> <!-- Action identifier 1:add -->
+    <form id="add-vocab-form" class="form-with-padding" method="POST"> <!-- id for JS -->
+        <input type="text" name="kanji" id="kanji" placeholder="Enter Kanji (optional)">
+        <input type="text" name="hiragana" id="hiragana" placeholder="Enter Hiragana" required>
+        <input type="text" name="meaning" id="meaning" placeholder="Enter Meaning" required>
         <button type="submit" class="btn-sub">Add</button>
     </form>
 
-    <!-- Filter Buttons -->
-    <button id="show-memorized" class="btn-memorized">Show Memorized</button>
-    <button id="show-unmemorized" class="btn-unmemorized">Show
-        Unmemorized</button>
-    <button id="show-all" class="btn-sub">Show All</button>
-
     <h2>Vocabulary list</h2>
-    <form id="vocabulary-list-form" method="POST" action="{{ url_for('vocab', title_id=title_id) }}">
-        <input type="hidden" name="action" value="update_vocab"> <!-- Action identifier 2:update-->
-        <table id="vocab-table">
+    <table id="vocab-table">
+        <thead>
             <tr>
                 <th>Kanji</th>
                 <th>Hiragana</th>
                 <th>Meaning</th>
-                <th>Memorized?</th>
+                <th>Action</th>
             </tr>
-            {% for item in vocab_list %}
-            <tr>
-                <td>{{ item.Kanji if item.Kanji != '(empty)' else 'No Kanji' }}</td>
-                <td>
-                    {% if item.Kanji == '(empty)' %}
-                        {{ item.Hiragana }}
-                    {% else %}
-                        <span class="hiragana hidden">{{ item.Hiragana }}</span>
-                        <button type="button" onclick="toggleHiragana(this)"
-                            class="btn-toggle">Show/Hide Hiragana</button>
-                    {% endif %}
-                </td>
-                <td>
-                    <span class="meaning hidden">{{ item.Meaning }}</span>
-                    <button type="button" onclick="toggleMeaning(this)"
-                            class="btn-toggle">Show/Hide Meaning</button>
-                </td>
-                <td>
-                    <input type="checkbox" name="memorized_ids" value="{{ item.ID }}"
-                       {% if item.Memorized %}checked{% endif %}>
-                </td>
+        </thead>
+        <tbody>
+            {% for item in vocabs %}
+            <tr data-id="{{ item.ID }}">
+                <td>{{ item.Kanji }}</td>
+                <td>{{ item.Hiragana }}</td>
+                <td>{{ item.Meaning }}</td>
+                <td><button class="btn-delete" data-id="{{ item.ID }}" onclick="deleteItem(event)">Delete</button></td>
             </tr>
             {% endfor %}
-        </table>
-        <button type="submit" class="btn-sub">Update Memorized Status</button>
-    </form>
-
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+        </tbody>
+    </table>
 
     <a href="{{ url_for('index') }}" class="btn-back">Back to Main</a>
+
+<!--    <script src="{{ url_for('static', filename='script.js') }}" defer></script>-->
+
 </body>
 </html>

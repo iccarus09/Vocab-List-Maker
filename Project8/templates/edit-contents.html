@@ -30,11 +30,11 @@
         </thead>
         <tbody>
             {% for content in contents %}
-            <tr data-id="{{ content.ID}}">
+            <tr data-id="{{ content.ID }}">
                 <td class="left-align"><a href="{{ content.Link }}" target="_blank">{{ content.Title }} </a></td>
                 <td>{{ content.Level }}</td>
                 <td>{{ content.Vocab_Count }}</td>
-                <td><button class="btn-delete" data-id="{{ content.ID }}">Delete</button></td>
+                <td><button class="btn-delete" data-id="{{ content.ID }}" >Delete</button></td>
             </tr>
             {% endfor %}
         </tbody>
