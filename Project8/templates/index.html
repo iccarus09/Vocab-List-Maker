@@ -18,7 +18,7 @@
         {% for content in contents %}
         <tr>
             <td  class="left-align"><a href="/edit-vocab/{{ content.ID }}">{{ content.Title }}</a></td>
-            <td><a href="https://{{ content.Link }}" target="_blank">Link
+            <td><a href="{{ content.Link }}" target="_blank">Link
             </a></td>
             <td>{{ content.Level }}</td>
             <td>{{ vocab_count.get(content.ID, 0) }}</td>

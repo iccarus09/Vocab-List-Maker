@@ -7,8 +7,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='/main.css') }}">
     <script>
-        console.log("Inline script start");
-
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOM fully loaded and parsed");
 
@@ -45,17 +43,15 @@
                 });
             });
         });
-
-        console.log("Inline script end");
     </script>
-    <script src="{{ url_for('static', filename='edit_vocab.js') }}" ></script>
+    <script src="{{ url_for('static', filename='edit_vocab.js') }}" defer></script>
 
 <!--        function buttonClicked() {-->
 <!--            alert("Button was pressed!"); // Show alert-->
 <!--        }-->
 </head>
 <body>
-    <h1>Edit Vocabulary for {{ title }}</h1>
+    <h1>Edit Vocabulary for<br>{{ title }}</h1>
 
     <!-- Form to add new vocabulary -->
     <h2>Add New Vocabulary</h2>
@@ -73,6 +69,7 @@
                 <th>Kanji</th>
                 <th>Hiragana</th>
                 <th>Meaning</th>
+                <th>Memorized?</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -82,6 +79,13 @@
                 <td>{{ item.Kanji }}</td>
                 <td>{{ item.Hiragana }}</td>
                 <td>{{ item.Meaning }}</td>
+                <td>
+                {% if item.Memorized|trim == 'True' %}
+                    <span class="circle green-circle"></span>
+                {% else %}
+                    <span class="circle red-circle"></span>
+                {% endif %}
+                </td>
                 <td><button class="btn-delete" data-id="{{ item.ID }}" onclick="deleteItem(event)">Delete</button></td>
             </tr>
             {% endfor %}

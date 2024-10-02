@@ -114,23 +114,44 @@ def edit_vocablist(title_id):
 @app.route('/mylist', methods=['GET','POST'])
 def get_mylist():
     # Handle deletion
-    if request.method == 'POST':
-        id_to_delete = request.form.get('id')
+    # if request.method == 'POST':
+    #     id_to_delete = request.form.get('id')
+    #
+    #     # if id_to_delete:
+    #     #     vocab_df = helpers.read_csv('vocab.csv')
+    #     #     # Remove the item with this ID
+    #     #     vocab_df = vocab_df[vocab_df['ID'] != int(id_to_delete)]
+    #     #     helpers.write_csv('vocab.csv', vocab_df)
+    #
+    #     # Redirect after deletion
+    #     return redirect(url_for('get_mylist'))
 
-        if id_to_delete:
-            vocab_df = helpers.read_csv('vocab.csv')
-            # Remove the item with this ID
-            vocab_df = vocab_df[vocab_df['ID'] != int(id_to_delete)]
-            helpers.write_csv('vocab.csv', vocab_df)
-
-        # Redirect after deletion
-        return redirect(url_for('get_mylist'))
+    ## this is required for status save but this affect my js filter button
+    # if request.method == 'POST': # Update the 'Memorized' column based on checkbox selection
+    #     print("update vocab")
+    #     vocab_df = helpers.read_csv('vocab.csv')
+    #     # Get the list of memorized IDs from the form
+    #     memorized_ids = request.form.getlist('memorized_ids')
+    #
+    #
+    #     my_vocabs = vocab_df.to_dict(orient='records')
+    #     return render_template('mylist.html', mylists=my_vocabs)
 
     # Handle GET request
+    content_df = helpers.read_csv('data.csv')
     vocab_df = helpers.read_csv('vocab.csv')
-    vocab_count = len(vocab_df)
-    mylists = vocab_df.to_dict(orient='records')
-    return render_template('mylist.html', mylists=mylists, vocab_count=vocab_count)
+    vocab_count = content_df['Vocab_Count'].sum()
+    m_vocab_count = content_df['Vocab_Count_M'].sum()
+
+    # Calculate percentage of memorized vocabularies
+    if vocab_count > 0:
+        memorized_percentage = int((m_vocab_count / vocab_count) * 100)
+    else:
+        memorized_percentage = 0  # Avoid division by zero
+
+    my_vocabs = vocab_df.to_dict(orient='records')
+    return render_template('mylist.html', my_vocabs=my_vocabs,
+                           vocab_count=vocab_count, memorized_percentage=memorized_percentage)
 
 @app.route('/edit-contents', methods=['GET','POST','DELETE'])
 def edit_contentlist():

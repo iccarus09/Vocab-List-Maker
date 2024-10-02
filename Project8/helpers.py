@@ -29,20 +29,33 @@ def get_vocab_count_and_level():
     # Debugging: Print out vocab_count
     print("Vocab Count:\n", vocab_count)
 
-    merged_df = contents_df.merge(vocab_count, left_on='ID',
-                                  right_on='Content_ID', how='left')
+    # Calculate memorized and unmemorized counts
+    vocab_count_m = new_vocab_df[new_vocab_df['Memorized'] == True].groupby(
+        'Content_ID').size().reset_index(name='Count_M')
+    vocab_count_um = new_vocab_df[new_vocab_df['Memorized'] == False].groupby(
+        'Content_ID').size().reset_index(name='Count_UM')
 
-    # # Debugging: Print out merged DataFrame
-    # print("Merged DataFrame:\n", merged_df)
+    # Merge the total vocab count with memorized and unmemorized counts
+    merged_df = contents_df.merge(vocab_count, left_on='ID',
+                                  right_on='Content_ID', how='left') \
+        .merge(vocab_count_m, left_on='ID', right_on='Content_ID', how='left') \
+        .merge(vocab_count_um, left_on='ID', right_on='Content_ID', how='left')
+
+
+    # Debugging: Print out merged DataFrame
+    print("Merged DataFrame:\n", merged_df)
 
     # Use .loc[] to fill NaN values and convert to int
     merged_df.loc[:, 'Vocab_Cal'] = merged_df['Vocab_Cal'].fillna(0).astype(int)
     merged_df.loc[:, 'Level'] = merged_df['Vocab_Cal'].apply(determine_level)
+    merged_df.loc[:, 'Count_M'] = merged_df['Count_M'].fillna(0).astype(int)
+    merged_df.loc[:, 'Count_UM'] = merged_df['Count_UM'].fillna(0).astype(int)
 
-    final_df = merged_df[['ID', 'Title', 'Link', 'Level', 'Vocab_Cal']].copy()
+    final_df = merged_df[['ID', 'Title', 'Link', 'Level', 'Vocab_Cal', 'Count_M',
+         'Count_UM']].copy()
 
     # Rename Vocab_Cal to Vocab_Count before saving DF to data.csv
-    final_df.rename(columns={'Vocab_Cal': 'Vocab_Count'}, inplace=True)
+    final_df.rename(columns={'Vocab_Cal': 'Vocab_Count', 'Count_M': 'Vocab_Count_M', 'Count_UM': 'Vocab_Count_UM'}, inplace=True)
     final_df.to_csv('data.csv', index=False)
 
     return final_df

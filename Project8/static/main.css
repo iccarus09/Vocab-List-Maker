@@ -17,7 +17,11 @@ h2 {
     color: #5a2d91; /* Consistent color for subheadings */
 }
 
-/* New vocab addition */
+.summary {
+    text-align: center;
+}
+
+/* New vocab addition form */
 .form-with-padding {
     margin-bottom: 15px; /* Space between forms */
     padding: 15px;
@@ -32,22 +36,6 @@ input[type="text"] {
     margin-bottom: 10px; /* Space between inputs */
     border: 1px solid #ccc; /* Light border for inputs */
     border-radius: 4px; /* Rounded corners for inputs */
-}
-
-.btn-delete {
-    padding: 10px 15px; /* Padding inside buttons */
-    background-color: #5a2d91; /* Button background color */
-    color: white; /* Button text color */
-    border-radius: 4px; /* Rounded corners for buttons */
-    font-family: cursive, sans-serif;
-    cursor: pointer; /* Pointer cursor on hover */
-    border: none;
-    margin: 0;
-}
-
-button:hover {
-    background-color: #4b1f7a; /* Darker shade on hover */
-    color: white;
 }
 
 /* Table Styles */
@@ -76,15 +64,25 @@ th {
     display: none;
         }
 
-.btn-back {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 15px;
-    background-color: #5a2d91;
+
+/* Buttons */
+button:hover {
+    background-color: #4b1f7a; /* Darker shade on hover */
     color: white;
-    font-family: cursive, sans-serif;
-    border-radius: 4px;
+    cursor: pointer; /* Pointer cursor on hover */
 }
+
+
+.btn-delete {
+    padding: 10px 15px; /* Padding inside buttons */
+    background-color: #5a2d91; /* Button background color */
+    color: white; /* Button text color */
+    border-radius: 4px; /* Rounded corners for buttons */
+    font-family: cursive, sans-serif;
+    border: none;
+    margin: 0;
+}
+
 
 .btn-back {
     display: inline-block;
@@ -105,21 +103,13 @@ th {
     border-radius: 4px;
 }
 
-
-.btn-sub {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 5px 8px;
-    background-color: #534794;
-    color: white;
-    font-family: cursive, sans-serif;
-    border-radius: 4px;
-    border: none
+.btn-filter-group{
+    text-align: center;
 }
 
 .btn-memorized{
     display: inline-block;
-    margin-top: 10px;
+    margin-right: 10px;
     padding: 5px 8px;
     background-color: #0a240a;
     color: white;
@@ -130,9 +120,30 @@ th {
 
 .btn-unmemorized{
     display: inline-block;
-    margin-top: 10px;
+    margin-right: 10px;
     padding: 5px 8px;
-    background-color: #360c0e;
+    background-color: #0a240a;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+    border: none
+}
+/* memorized + unmemorized */
+.btn-all {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 5px 8px;
+    background-color: #0a240a;
+    color: white;
+    font-family: cursive, sans-serif;
+    border-radius: 4px;
+    border: none
+}
+
+.btn-m-status {
+    display: inline-block;
+    padding: 5px 8px;
+    background-color: #534794;
     color: white;
     font-family: cursive, sans-serif;
     border-radius: 4px;

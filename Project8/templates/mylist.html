@@ -5,41 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Vocab List</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='/main.css') }}">
+    <script>
+        function toggleHiragana(button) {
+    const hiraganaSpan = button.previousElementSibling; // Get the span before the button
+    hiraganaSpan.classList.toggle('hidden');
+    }
+
+        function toggleMeaning(button) {
+    const meaningSpan = button.previousElementSibling;
+    meaningSpan.classList.toggle('hidden');
+    }
+
+    // Filter view
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.getElementById('mylist-table');
+        if (!table) return; // Exit if we're not on the vocab page
+
+        const rows = table.getElementsByTagName('tr');
+
+        function filterTable(showMemorized) {
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const isMemorized = checkbox.checked;
+                if (showMemorized === 'all' || (showMemorized && isMemorized) || (!showMemorized && !isMemorized)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        document.getElementById('show-memorized')?.addEventListener('click', function() {
+            filterTable(true);
+        });
+
+        document.getElementById('show-unmemorized')?.addEventListener('click', function() {
+            filterTable(false);
+        });
+
+        document.getElementById('show-all')?.addEventListener('click', function() {
+            filterTable('all');
+        });
+    });
+    </script>
 </head>
 <body>
     <h1>My Vocabulary List</h1>
-    <p style="display: inline;">Currently there are {{ vocab_count }} vocabularies in your list.</p>
-    <a href="{{ url_for('index') }}" class="btn-back-no-margin">Back to Main</a>
-    <table>
-        <tr>
-            <th>Kanji</th>
-            <th>Hiragana</th>
-            <th>Meaning</th>
-            <th>Memorized</th>
-            <th>Action</th>
-        </tr>
-        {% for mylist in mylists %}
-        <tr>
-            <td>{{ mylist.Kanji }}</td>
-            <td>{{ mylist.Hiragana }}</td>
-            <td>{{ mylist.Meaning }}</td>
-            <td>
-                {% if mylist.Memorized|trim == 'True' %}
-                    <span class="circle green-circle"></span>
-                {% else %}
-                    <span class="circle red-circle"></span>
-                {% endif %}
-            </td>
-            <td>
-                <form action="{{ url_for('get_mylist') }}"
-                      method="POST" style="display:inline;"
-                      class="form-without-padding">
-                    <input type="hidden" name="id" value="{{ mylist.ID }}">
-                    <button type="submit" class="btn-delete">Delete
-                    </button></form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+
+    <!-- Filter Buttons -->
+        <div class="btn-filter-group">
+            <button id="show-memorized" class="btn-memorized btn-filter">Show Memorized</button>
+            <button id="show-unmemorized" class="btn-unmemorized btn-filter">Show Unmemorized</button>
+            <button id="show-all" class="btn-all btn-filter">Show All</button>
+            <button type="submit" class="btn-m-status">Update Memorized Status</button>
+        </div>
+
+        <p class="summary">Currently there are {{ vocab_count }} vocabularies in your list.</p>
+        <p class="summary">You have memorized {{ memorized_percentage }}% of vocabularies.</p>
+
+        <table id="mylist-table">
+            <tr>
+                <th>Kanji</th>
+                <th>Hiragana</th>
+                <th>Meaning</th>
+                <th>Memorized?</th>
+            </tr>
+            {% for item in my_vocabs %}
+            <tr>
+                <td>{{ item.Kanji }}</td>
+                <td>
+                     {% if item.Kanji == '(empty)' %}
+                        {{ item.Hiragana }}
+                     {% else %}
+                        <span class="hiragana hidden">{{ item.Hiragana }}</span>
+                        <button type="button" onclick="toggleHiragana(this)"
+                            class="btn-toggle">Show/Hide Hiragana</button>
+                     {% endif %}
+                </td>
+                <td>
+                    <span class="meaning hidden">{{ item.Meaning }}</span>
+                    <button type="button" onclick="toggleMeaning(this)"
+                                class="btn-toggle">Show/Hide Meaning</button>
+                </td>
+                <td>
+                    <input type="checkbox" name="memorized_ids" value="{{ item.ID }}"
+                       {% if item.Memorized %}checked{% endif %}>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+
     <a href="{{ url_for('index') }}" class="btn-back">Back to Main</a>
 </body>
+</html>
